@@ -139,12 +139,12 @@ namespace ExtractMemberForces
 				$"{nameof(MemberData.SpanLength)}," +
 				$"{nameof(MemberData.Position)}," +
 				$"{nameof(MemberData.LoadCase)}," +
-				$"{nameof(MemberData.Fx)}," +
-				$"{nameof(MemberData.Fy)}," +
-				$"{nameof(MemberData.Fz)}," +
-				$"{nameof(MemberData.Mxx)}," +
-				$"{nameof(MemberData.Myy)}," +
-				$"{nameof(MemberData.Mzz)},");
+				$"{nameof(MemberData.Axial)}," +
+				$"{nameof(MemberData.ShearMajor)}," +
+				$"{nameof(MemberData.ShearMinor)}," +
+				$"{nameof(MemberData.Torsion)}," +
+				$"{nameof(MemberData.MomentMajor)}," +
+				$"{nameof(MemberData.MomentMinor)},");
 			
 			// Append second line which will contain units where applicable
 			stringBuilder.AppendLine(
@@ -170,9 +170,6 @@ namespace ExtractMemberForces
 
 			double newtonToKip = 0.00022480894387096;
 			double millimeterToFoot = 0.00328084;
-
-			double kipToNewton = 4448.2216;
-			double footToMillimeter = 304.8;
 
 			// Get all members in the model. Pass null as the parameter to get all members; alternatively a sequence of indices can be passed to get specific members
 			var members = await model.GetMemberAsync(null);
@@ -270,22 +267,22 @@ namespace ExtractMemberForces
 							}
 
 							// Get max axial force
-							memberData.Fx = (await memberLoading.GetValueAsync(forceValueOption, axialLoadingDirection, span, position)).Max(lv => lv.Value) * newtonToKip;
-
-							// Get max minor axis shear force
-							memberData.Fy = (await memberLoading.GetValueAsync(forceValueOption, minorLoadingDirection, span, position)).Max(lv => lv.Value) * newtonToKip;
+							memberData.Axial = (await memberLoading.GetValueAsync(forceValueOption, axialLoadingDirection, span, position)).Max(lv => lv.Value) * newtonToKip;
 
 							// Get max major axis shear force
-							memberData.Fz = (await memberLoading.GetValueAsync(forceValueOption, majorLoadingDirection, span, position)).Max(lv => lv.Value) * newtonToKip;
+							memberData.ShearMajor = (await memberLoading.GetValueAsync(forceValueOption, majorLoadingDirection, span, position)).Max(lv => lv.Value) * newtonToKip;
+
+							// Get max minor axis shear force
+							memberData.ShearMinor = (await memberLoading.GetValueAsync(forceValueOption, minorLoadingDirection, span, position)).Max(lv => lv.Value) * newtonToKip;
 
 							// Get max torsion force
-							memberData.Mxx = (await memberLoading.GetValueAsync(momentValueOption, axialLoadingDirection, span, position)).Max(lv => lv.Value) * newtonToKip * millimeterToFoot;
+							memberData.Torsion = (await memberLoading.GetValueAsync(momentValueOption, axialLoadingDirection, span, position)).Max(lv => lv.Value) * newtonToKip * millimeterToFoot;
 
 							// Get max major axis bending force
-							memberData.Myy = (await memberLoading.GetValueAsync(momentValueOption, majorLoadingDirection, span, position)).Max(lv => lv.Value) * newtonToKip * millimeterToFoot;
+							memberData.MomentMajor = (await memberLoading.GetValueAsync(momentValueOption, majorLoadingDirection, span, position)).Max(lv => lv.Value) * newtonToKip * millimeterToFoot;
 
 							// Get max minor axis bending force
-							memberData.Mzz = (await memberLoading.GetValueAsync(momentValueOption, minorLoadingDirection, span, position)).Max(lv => lv.Value) * newtonToKip * millimeterToFoot;
+							memberData.MomentMinor = (await memberLoading.GetValueAsync(momentValueOption, minorLoadingDirection, span, position)).Max(lv => lv.Value) * newtonToKip * millimeterToFoot;
 
 							// Add a new line containing the data for this member to the output file
 							stringBuilder.AppendLine(
@@ -299,12 +296,12 @@ namespace ExtractMemberForces
 								$"{memberData.SpanLength}," +
 								$"{memberData.Position}," +
 								$"{memberData.LoadCase}," +
-								$"{memberData.Fx}," +
-								$"{memberData.Fy}," +
-								$"{memberData.Fz}," +
-								$"{memberData.Mxx}," +
-								$"{memberData.Myy}," +
-								$"{memberData.Mzz},");							
+								$"{memberData.Axial}," +
+								$"{memberData.ShearMajor}," +
+								$"{memberData.ShearMinor}," +
+								$"{memberData.Torsion}," +
+								$"{memberData.MomentMajor}," +
+								$"{memberData.MomentMinor},");							
 
 						}
 

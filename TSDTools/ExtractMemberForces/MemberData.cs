@@ -61,32 +61,32 @@ namespace ExtractMemberForces
 		/// <summary>
 		/// Gets or sets Fx
 		/// </summary>
-		public double Fx { get; set; }
+		public double Axial { get; set; }
 
 		/// <summary>
 		/// Gets or sets Fy
 		/// </summary>
-		public double Fy { get; set; }
+		public double ShearMajor { get; set; }
 
 		/// <summary>
 		/// Gets or sets Fz
 		/// </summary>
-		public double Fz { get; set; }
+		public double ShearMinor { get; set; }
 
 		/// <summary>
 		/// Gets or sets Mxx
 		/// </summary>
-		public double Mxx { get; set; }
+		public double Torsion { get; set; }
 
 		/// <summary>
 		/// Gets or sets Myy
 		/// </summary>
-		public double Myy { get; set; }
+		public double MomentMajor { get; set; }
 
 		/// <summary>
 		/// Gets or sets Mzz
 		/// </summary>
-		public double Mzz { get; set; }
+		public double MomentMinor { get; set; }
 
 		#endregion
 	}
