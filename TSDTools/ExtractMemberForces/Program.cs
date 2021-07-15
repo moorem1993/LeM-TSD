@@ -124,27 +124,55 @@ namespace ExtractMemberForces
 				return;
 			}
 
-			// Create a new Excel workbook for storing extracted data
-			var workbook = new XLWorkbook();
-			var worksheet = workbook.Worksheets.Add("Member Forces");
+			// Instantiate a new string builder, we will use this to help write our output .csv file
+			var stringBuilder = new StringBuilder();
 
-			// Add headers to the worksheet
-			worksheet.Cell("A1").Value = "Name";
-			worksheet.Cell("B1").Value = "Type";
-			worksheet.Cell("C1").Value = "Section";
-			worksheet.Cell("D1").Value = "Total Length";
-			worksheet.Cell("E1").Value = "Span";
-			worksheet.Cell("F1").Value = "Span Length";
-			worksheet.Cell("G1").Value = "Load Case";
-			worksheet.Cell("H1").Value = "Position";
-			worksheet.Cell("I1").Value = "Fx";
-			worksheet.Cell("J1").Value = "Fy";
-			worksheet.Cell("K1").Value = "Fz";
-			worksheet.Cell("L1").Value = "Mxx";
-			worksheet.Cell("M1").Value = "Myy";
-			worksheet.Cell("N1").Value = "Mzz";
+			// Append the first line which will contain the column headers
+			stringBuilder.AppendLine(
+				$"{nameof(MemberData.Guid)}," +
+				$"{nameof(MemberData.Name)}," +
+				$"{nameof(MemberData.Type)}," +
+				$"{nameof(MemberData.Section)}," +
+				$"{nameof(MemberData.Material)}," +
+				$"{nameof(MemberData.TotalLength)}," +
+				$"{nameof(MemberData.Span)}," +
+				$"{nameof(MemberData.SpanLength)}," +
+				$"{nameof(MemberData.Position)}," +
+				$"{nameof(MemberData.LoadCase)}," +
+				$"{nameof(MemberData.Fx)}," +
+				$"{nameof(MemberData.Fy)}," +
+				$"{nameof(MemberData.Fz)}," +
+				$"{nameof(MemberData.Mxx)}," +
+				$"{nameof(MemberData.Myy)}," +
+				$"{nameof(MemberData.Mzz)},");
+			
+			// Append second line which will contain units where applicable
+			stringBuilder.AppendLine(
+				$"," +
+				$"," +
+				$"," +
+				$"," +
+				$"," +
+				$"[ft]," +
+				$"," +
+				$"[ft]," +
+				$"," +
+				$"," +
+				$"[kip]," +
+				$"[kip]," +
+				$"[kip]," +
+				$"[kip-ft]," +
+				$"[kip-ft]," +
+				$"[kip-ft],");
 
-			var row = 2;
+			// Unit conversion definitions
+			// TODO: Factor this out into helper functions for clarity
+
+			double newtonToKip = 0.00022480894387096;
+			double millimeterToFoot = 0.00328084;
+
+			double kipToNewton = 4448.2216;
+			double footToMillimeter = 304.8;
 
 			// Get all members in the model. Pass null as the parameter to get all members; alternatively a sequence of indices can be passed to get specific members
 			var members = await model.GetMemberAsync(null);
@@ -181,21 +209,35 @@ namespace ExtractMemberForces
 				// Create the output data object and set some member properties
 				var memberData = new MemberData
 				{
-					MemberName = member.Name,
-					MemberType = member.Type.ToString(),
-					MemberTotalLength = totalLength,
+					Guid = member.Id.ToString(),
+					Name = member.Name,
+					Type = member.Type.ToString(),
+					TotalLength = totalLength * millimeterToFoot,
 				};
 
 				// Loop through the span of each member
 				for (int span = 0; span < member.SpanCount; span++)
 				{
-					memberData.MemberSection = (await member.GetSpanAsync(span)).ExtendedSection.Name;
+
+					// Get the span object based on index
+					var spanObject = await member.GetSpanAsync(span);
+
+					// Collect information about this span of the member
+					memberData.Section = spanObject.ExtendedSection.Name;
+					memberData.Material = spanObject.Material.Name;
 					memberData.Span = span;
-					memberData.SpanLength = (await member.GetSpanAsync(span)).Length;
+					memberData.SpanLength = spanObject.Length * millimeterToFoot;
 
 					// For each span in the member, loop through the collection of solved loadcases
 					foreach (var solvedLoadcase in solvedLoadcases)
 					{
+
+						// Skip over empty loadcases
+						// TODO: Figure out why these are in here anyways
+						if (solvedLoadcase.Name == "0 ")
+                        {
+							continue;
+						}
 
 						memberData.LoadCase = solvedLoadcase.Name;
 
@@ -210,7 +252,7 @@ namespace ExtractMemberForces
 						}
 
 						// Set step size for position along span
-						double step = 0.25;
+						double step = 0.1;
 
 						for (double positionRatio = 0.0; positionRatio <= 1.0; positionRatio += step)
 						{
@@ -219,7 +261,7 @@ namespace ExtractMemberForces
 
 							// Position is the measured length along the member, not the ratio
 							// Covert ratio to length based on length of span
-							var position = positionRatio * memberData.SpanLength;
+							var position = positionRatio * spanObject.Length;
 
 							// Handle case where we are looking at the end of a span - for some reason output is zero when position = length of span
 							if (positionRatio > 0.9)
@@ -228,41 +270,42 @@ namespace ExtractMemberForces
 							}
 
 							// Get max axial force
-							memberData.Fx = (await memberLoading.GetValueAsync(forceValueOption, axialLoadingDirection, span, position)).Max(lv => lv.Value);
+							memberData.Fx = (await memberLoading.GetValueAsync(forceValueOption, axialLoadingDirection, span, position)).Max(lv => lv.Value) * newtonToKip;
 
 							// Get max minor axis shear force
-							memberData.Fy = (await memberLoading.GetValueAsync(forceValueOption, minorLoadingDirection, span, position)).Max(lv => lv.Value);
+							memberData.Fy = (await memberLoading.GetValueAsync(forceValueOption, minorLoadingDirection, span, position)).Max(lv => lv.Value) * newtonToKip;
 
 							// Get max major axis shear force
-							memberData.Fz = (await memberLoading.GetValueAsync(forceValueOption, majorLoadingDirection, span, position)).Max(lv => lv.Value);
+							memberData.Fz = (await memberLoading.GetValueAsync(forceValueOption, majorLoadingDirection, span, position)).Max(lv => lv.Value) * newtonToKip;
 
 							// Get max torsion force
-							memberData.Mxx = (await memberLoading.GetValueAsync(momentValueOption, axialLoadingDirection, span, position)).Max(lv => lv.Value);
+							memberData.Mxx = (await memberLoading.GetValueAsync(momentValueOption, axialLoadingDirection, span, position)).Max(lv => lv.Value) * newtonToKip * millimeterToFoot;
 
 							// Get max major axis bending force
-							memberData.Myy = (await memberLoading.GetValueAsync(momentValueOption, majorLoadingDirection, span, position)).Max(lv => lv.Value);
+							memberData.Myy = (await memberLoading.GetValueAsync(momentValueOption, majorLoadingDirection, span, position)).Max(lv => lv.Value) * newtonToKip * millimeterToFoot;
 
 							// Get max minor axis bending force
-							memberData.Mzz = (await memberLoading.GetValueAsync(momentValueOption, minorLoadingDirection, span, position)).Max(lv => lv.Value);
+							memberData.Mzz = (await memberLoading.GetValueAsync(momentValueOption, minorLoadingDirection, span, position)).Max(lv => lv.Value) * newtonToKip * millimeterToFoot;
 
-							// Write data to excel sheet
-							worksheet.Cell(row, 1).Value = memberData.MemberName;
-							worksheet.Cell(row, 2).Value = memberData.MemberType;
-							worksheet.Cell(row, 3).Value = memberData.MemberSection;
-							worksheet.Cell(row, 4).Value = memberData.MemberTotalLength;
-							worksheet.Cell(row, 5).Value = memberData.Span;
-							worksheet.Cell(row, 6).Value = memberData.SpanLength;
-							worksheet.Cell(row, 7).Value = memberData.LoadCase;
-							worksheet.Cell(row, 8).Value = memberData.Position;
-							worksheet.Cell(row, 9).Value = memberData.Fx;
-							worksheet.Cell(row, 10).Value = memberData.Fy;
-							worksheet.Cell(row, 11).Value = memberData.Fz;
-							worksheet.Cell(row, 12).Value = memberData.Mxx;
-							worksheet.Cell(row, 13).Value = memberData.Myy;
-							worksheet.Cell(row, 14).Value = memberData.Mzz;
+							// Add a new line containing the data for this member to the output file
+							stringBuilder.AppendLine(
+								$"{memberData.Guid}," +
+								$"{memberData.Name}," +
+								$"{memberData.Type}," +
+								$"{memberData.Section}," +
+								$"{memberData.Material}," +
+								$"{memberData.TotalLength}," +
+								$"{memberData.Span}," +
+								$"{memberData.SpanLength}," +
+								$"{memberData.Position}," +
+								$"{memberData.LoadCase}," +
+								$"{memberData.Fx}," +
+								$"{memberData.Fy}," +
+								$"{memberData.Fz}," +
+								$"{memberData.Mxx}," +
+								$"{memberData.Myy}," +
+								$"{memberData.Mzz},");							
 
-							// Increment worksheet row
-							row++;
 						}
 
 					}
@@ -271,9 +314,11 @@ namespace ExtractMemberForces
 
 			}
 
-			// Save the workbook to the same directory as the model
-			workbook.SaveAs($"{Path.GetDirectoryName(document.Path)}/MemberForceExtraction.xlsx");
+			// Write the .csv file with the output data to the same directory as the model
+			File.WriteAllText($"{Path.GetDirectoryName(document.Path)}/MemberForces.csv", stringBuilder.ToString());
+
 		}
+		
 		#endregion
 	}
 }

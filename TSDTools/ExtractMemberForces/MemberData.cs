@@ -9,24 +9,34 @@ namespace ExtractMemberForces
 		#region Properties
 
 		/// <summary>
+		/// Gets or sets the member ID
+		/// </summary>
+		public string Guid { get; set; }
+
+		/// <summary>
 		/// Gets or sets the member name
 		/// </summary>
-		public string MemberName { get; set; }
+		public string Name { get; set; }
 
 		/// <summary>
 		/// Gets or sets the members type
 		/// </summary>
-		public string MemberType { get; set; }
+		public string Type { get; set; }
 
 		/// <summary>
 		/// Gets or sets the members section
 		/// </summary>
-		public string MemberSection { get; set; }
+		public string Section { get; set; }
+
+		/// <summary>
+		/// Gets or sets the members material
+		/// </summary>
+		public string Material { get; set; }
 
 		/// <summary>
 		/// Gets or sets the members total length (includes all spans)
 		/// </summary>
-		public double MemberTotalLength { get; set; }
+		public double TotalLength { get; set; }
 
 		/// <summary>
 		/// Gets or sets the span within the member
