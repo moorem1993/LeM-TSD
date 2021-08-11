@@ -4,6 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
+using System.Diagnostics;
+using System.ComponentModel;
 
 using TSD.API.Remoting;
 using TSD.API.Remoting.Loading;
@@ -23,21 +26,59 @@ namespace ExtractMemberForces
 		/// </summary>
 		public static async Task Main()
 		{
+
+			// Get filepath from user
+			Console.WriteLine("Enter TSD filepath:");
+
+			// Create a string variable and get user input
+			string filepath = Console.ReadLine();
+
+			// Sample filepath
+			// filepath = @"C:\Users\mmoore\OneDrive - LeMessurier Consultants\Desktop\TSD API Test Model Simple.tsmd";
+
+			// Start an instance of TSD
+			Console.WriteLine("Starting instance of TSD");
+			Process process = new Process();
+			process.StartInfo = new ProcessStartInfo(@"C:\Program Files\Tekla\Structural\Structural Designer 2021\TSD.exe");
+			process.Start();
+
 			// Get all instances of TSD running on the local machine
 			var tsdRunningInstances = await ApplicationFactory.GetRunningApplicationsAsync();
 
-			if (!tsdRunningInstances.Any())
+			// Continuously check to see if the instance has opened
+			while (true)
 			{
-				Console.WriteLine("No running instances of TSD found!");
-
-				return;
+				tsdRunningInstances = await ApplicationFactory.GetRunningApplicationsAsync();
+				if (tsdRunningInstances.Any())
+                {
+					Console.WriteLine("TSD instance running");
+					break;
+                }
 			}
 
 			// Get the first running TSD instance found
 			var tsdInstance = tsdRunningInstances.First();
 
-			// Get the active document from the running instance of TSD
-			var document = await tsdInstance.GetDocumentAsync();
+			// Open the document based on specified file path
+			Console.WriteLine("Opening TSD document");
+			while (true)
+            {
+				// Try opening the document
+				try
+				{
+					var documentCheck = await tsdInstance.OpenDocumentAsync(filepath, false);
+					Console.WriteLine("Document opened");
+					break;
+				}
+				// If the instance of TSD isn't ready yet, wait 1s and try again
+				catch (Exception e)
+				{
+					Console.WriteLine(".");
+					Thread.Sleep(1000);
+				}
+			}
+
+			var document = await tsdInstance.OpenDocumentAsync(@"C:\Users\mmoore\OneDrive - LeMessurier Consultants\Desktop\TSD API Test Model Simple.tsmd", false);
 
 			if (document == null)
 			{
@@ -47,6 +88,7 @@ namespace ExtractMemberForces
 			}
 
 			// Get the model from the document
+			Console.WriteLine("Getting model from document");
 			var model = await document.GetModelAsync();
 
 			if (model == null)
@@ -60,6 +102,7 @@ namespace ExtractMemberForces
 			var analysisType = AnalysisType.FirstOrderLinear;
 
 			// Get the solver models for the requested analysis types
+			Console.WriteLine("Getting solver models");
 			var solverModels = await model.GetSolverModelsAsync(new[] { analysisType });
 
 			if (!solverModels.Any())
@@ -90,6 +133,7 @@ namespace ExtractMemberForces
 			}
 
 			// Get the first order linear analysis results
+			Console.WriteLine("Getting analysis results");
 			var analysis3DResults = await firstOrderLinearSolverResults.GetAnalysis3DAsync();
 
 			if (analysis3DResults == null)
@@ -172,6 +216,7 @@ namespace ExtractMemberForces
 			double millimeterToFoot = 0.00328084;
 
 			// Get all members in the model. Pass null as the parameter to get all members; alternatively a sequence of indices can be passed to get specific members
+			Console.WriteLine("Getting member data");
 			var members = await model.GetMemberAsync(null);
 
 			if (!members.Any())
@@ -313,6 +358,10 @@ namespace ExtractMemberForces
 
 			// Write the .csv file with the output data to the same directory as the model
 			File.WriteAllText($"{Path.GetDirectoryName(document.Path)}/MemberForces.csv", stringBuilder.ToString());
+
+			// Close TSD instance
+			Console.WriteLine("Closing TSD instance");
+			process.CloseMainWindow();
 
 		}
 		
