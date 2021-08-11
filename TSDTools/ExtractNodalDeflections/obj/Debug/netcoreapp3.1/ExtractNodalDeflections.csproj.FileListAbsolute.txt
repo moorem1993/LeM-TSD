@@ -1,0 +1,25 @@
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\bin\Debug\netcoreapp3.1\ExtractNodalDeflections.exe
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\bin\Debug\netcoreapp3.1\ExtractNodalDeflections.deps.json
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\bin\Debug\netcoreapp3.1\ExtractNodalDeflections.runtimeconfig.json
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\bin\Debug\netcoreapp3.1\ExtractNodalDeflections.runtimeconfig.dev.json
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\bin\Debug\netcoreapp3.1\ExtractNodalDeflections.dll
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\bin\Debug\netcoreapp3.1\ExtractNodalDeflections.pdb
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\bin\Debug\netcoreapp3.1\Google.Protobuf.dll
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\bin\Debug\netcoreapp3.1\Grpc.Core.dll
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\bin\Debug\netcoreapp3.1\Grpc.Core.Api.dll
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\bin\Debug\netcoreapp3.1\TSD RPC.dll
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\bin\Debug\netcoreapp3.1\TSD.API.Remoting.dll
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\bin\Debug\netcoreapp3.1\runtimes\linux\native\libgrpc_csharp_ext.x64.so
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\bin\Debug\netcoreapp3.1\runtimes\linux\native\libgrpc_csharp_ext.x86.so
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\bin\Debug\netcoreapp3.1\runtimes\osx\native\libgrpc_csharp_ext.x64.dylib
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\bin\Debug\netcoreapp3.1\runtimes\osx\native\libgrpc_csharp_ext.x86.dylib
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\bin\Debug\netcoreapp3.1\runtimes\win\native\grpc_csharp_ext.x64.dll
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\bin\Debug\netcoreapp3.1\runtimes\win\native\grpc_csharp_ext.x86.dll
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\obj\Debug\netcoreapp3.1\ExtractNodalDeflections.csproj.AssemblyReference.cache
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\obj\Debug\netcoreapp3.1\ExtractNodalDeflections.AssemblyInfoInputs.cache
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\obj\Debug\netcoreapp3.1\ExtractNodalDeflections.AssemblyInfo.cs
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\obj\Debug\netcoreapp3.1\ExtractNodalDeflections.csproj.CoreCompileInputs.cache
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\obj\Debug\netcoreapp3.1\ExtractNodalDeflections.csproj.CopyComplete
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\obj\Debug\netcoreapp3.1\ExtractNodalDeflections.dll
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\obj\Debug\netcoreapp3.1\ExtractNodalDeflections.pdb
+C:\Users\mmoore\github\LeM-TSD\TSDTools\ExtractNodalDeflections\obj\Debug\netcoreapp3.1\ExtractNodalDeflections.genruntimeconfig.cache
